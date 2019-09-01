@@ -38,14 +38,12 @@ function getProducts(askIt) {
     var items = [];
     products.forEach(element => {
       if (element.stock_quantity > 0) {
-        if (!items.includes(element.product_name)) {
-          items.push({
-            ID: element.item_id,
-            Product: element.product_name,
-            Price: "$" + element.price,
-            Quantity: element.stock_quantity
-          });
-        }
+        items.push({
+          ID: element.item_id,
+          Product: element.product_name,
+          Price: "$" + element.price,
+          Quantity: element.stock_quantity
+        });
       }
       if (element.stock_quantity < 5) {
         low_inventory_products.push({
