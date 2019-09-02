@@ -16,6 +16,10 @@ The app utilizes the CLI terminal for user interaction. There are 3 separate nod
    <br>
 1. **bamazonSupervisor.js** - this file is used by the Supervisor to view product sales by departments, as well the ability to add new departments.
    <br>
+1. **bamazon_products.sql** - Products table schema file with sample data
+<br>
+1. **bamazon_departments.sql** - Departments table schema file with sample data
+<br>
 
 ## How to use
 
