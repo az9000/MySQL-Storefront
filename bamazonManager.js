@@ -11,6 +11,7 @@ const connection = mysql.createConnection({
   database: "bamazon"
 });
 
+
 var main_menu = {
   type: "list",
   name: "menu",
@@ -29,6 +30,19 @@ var low_inventory_products = [];
 var productId = -1;
 var quantityToAdd = 0;
 var newProduct = {};
+var departments = [];
+
+connection.connect(function(err){
+  if (err) throw err;
+  connection.query('select department_name from departments;', function(error, results) {
+    if (error) throw error;
+
+    results.forEach(element => {
+      departments.push(element.department_name);
+    });
+
+  })
+});
 
 function getProducts(askIt) {
   connection.query("select * from products", function(error, results, fields) {
@@ -37,6 +51,7 @@ function getProducts(askIt) {
 
     var items = [];
     products.forEach(element => {
+
       if (element.stock_quantity > 0) {
         items.push({
           ID: element.item_id,
@@ -54,6 +69,7 @@ function getProducts(askIt) {
         });
       }
     });
+
     if (askIt) {
       ask({
         type: "list",
@@ -144,6 +160,7 @@ function addNewProduct(product) {
 
 function ask(question) {
   inquirer.prompt([question]).then(answers => {
+    //console.log(answers);
     if (answers.menu) {
       switch (answers.menu) {
         case "View Products for Sale": {
@@ -159,7 +176,16 @@ function ask(question) {
             ask({
               type: "input",
               name: "item_id",
-              message: "Select product ID: "
+              message: "Select product ID: ",
+              validate: function(input) {
+                if (!input) {
+                  console.log('\ID must be a number!\nTry again!\n');
+                } else if (!validateNumber(input)) {
+                  console.log('\ID must be a number!\nTry again!\n');
+                  return false;
+                }
+                return input !== '';
+              }
             });
           } else {
             console.log("There are no low-inventory products!");
@@ -173,7 +199,10 @@ function ask(question) {
           ask({
             type: "input",
             name: "product_name",
-            message: "Enter product name: "
+            message: "Enter product name: ",
+            validate: function(input) {              
+              return input !== '';
+            }
           });
           break;
         }
@@ -191,32 +220,58 @@ function ask(question) {
       ask({
         type: "input",
         name: "item_count",
-        message: "Enter quantity number to add: "
+        message: "Enter quantity number to add: ",
+        validate: function(input) {
+          if (!input) {
+            console.log('\Quantity must be a number!\nTry again!\n');
+          } else if (!validateNumber(input)) {
+            console.log('\Quantity must be a number!\nTry again!\n');
+            return false;
+          }
+          return input !== '';
+        }
       });
     } else if (answers.item_count) {
       quantityToAdd = parseInt(answers.item_count);
       // add inventory
       addToInventory(productId, quantityToAdd);
     } else if (answers.product_name) {
-      newProduct.name = answers.product_name;
+      newProduct.name = answers.product_name; 
+      
       ask({
-        type: "input",
+        type: "list",
         name: "product_department",
-        message: "Enter product department: "
+        choices: departments,
+        message: "Select product department: "
       });
     } else if (answers.product_department) {
       newProduct.department = answers.product_department;
       ask({
         type: "input",
         name: "product_price",
-        message: "Enter product price: "
+        message: "Enter product price: ",
+        validate: function(input) {
+          if (!input) {
+            console.log('\nPrice must be a number!\nTry again!\n');
+          }
+          return input !== '';
+        }
       });
     } else if (answers.product_price) {
       newProduct.price = answers.product_price;
       ask({
         type: "input",
         name: "product_count",
-        message: "Enter product inventory: "
+        message: "Enter product inventory: ",
+        validate: function(input) {
+          if (!input) {
+            console.log('\Inventory must be a number!\nTry again!\n');
+          } else if (!validateNumber(input)) {
+            console.log('\Inventory must be a number!\nTry again!\n');
+            return false;
+          }
+          return input !== '';
+        }
       });
     } else if (answers.product_count) {
       newProduct.inventory = answers.product_count;
@@ -226,3 +281,19 @@ function ask(question) {
 }
 
 ask(main_menu);
+
+function validateNumber(value) {
+  if (!value) {
+    return false;
+  }
+  if (value.length === 0) {
+    return false;
+  }
+  for (var i = 0; i < value.length; i++) {
+    if (isNaN(parseInt(value[i]))) {
+      return false;
+    }
+  }
+
+  return true;
+}

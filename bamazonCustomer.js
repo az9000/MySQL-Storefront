@@ -40,19 +40,26 @@ function getProducts() {
     });
 
     ask({
-      type: "text",
+      type: "input",
       name: "ID",
       message: function() {
         console.log("Available products for sale:");
         console.table(items);
+      },
+      validate: function(input) {
+        if (!input) {
+          console.log("\nID should be a number!\nTry again!");
+        } else if (!validateNumber(input)) {
+          console.log("\nID should be a number!\nTry again!");
+          input = "";
+        }
+        return input !== "";
       }
     });
   });
 
   //closeConnection();
 }
-
-getProducts();
 
 var productName = "";
 var quantity = 1000;
@@ -80,9 +87,18 @@ function ask(question) {
           quantity = results[0].stock_quantity;
           productName = results[0].product_name;
           ask({
-            type: "text",
+            type: "input",
             name: "item_quantity",
-            message: "Enter quantity: "
+            message: "Enter quantity: ",
+            validate: function(input) {
+              if (!input) {
+                console.log("\nQuantity should be a number!\nTry again!");
+              } else if (!validateNumber(input)) {
+                console.log("\nQuantity should be a number!\nTry again!");
+                input = "";
+              }
+              return input !== "";
+            }
           });
         }
       );
@@ -92,16 +108,24 @@ function ask(question) {
         ask({
           type: "text",
           name: "item_quantity_error",
-          message: "Insufficient quantity!"
+          message: `Insufficient quantity!Only ${quantity} available!`
         });
+        // try again
         setTimeout(() => {
-          closeConnection();
-          process.exit(-1);
-        }, 500);
+          ask({
+            type: "list",
+            name: "option",
+            choices: ["Exit", "Continue"],
+            message: "What would you like to do now? "
+          });
+        }, 100);
       } else {
         // update the SQL database to reflect the remaining quantity
         var update_sql = `update products set stock_quantity=? where item_id=?;`;
         var current_quantity = quantity - requested_quantity;
+        if (current_quantity < 0) {
+          current_quantity = 0;
+        }
         connection.query(update_sql, [current_quantity, productId], function(
           error,
           results,
@@ -130,7 +154,7 @@ function ask(question) {
             results,
             fields
           ) {
-            console.log('Sold!');
+            console.log("Sold!");
             setTimeout(() => {
               ask({
                 type: "list",
@@ -144,4 +168,22 @@ function ask(question) {
       }
     }
   });
+}
+
+getProducts();
+
+function validateNumber(value) {
+  if (!value) {
+    return false;
+  }
+  if (value.length === 0) {
+    return false;
+  }
+  for (var i = 0; i < value.length; i++) {
+    if (isNaN(parseInt(value[i]))) {
+      return false;
+    }
+  }
+
+  return true;
 }
