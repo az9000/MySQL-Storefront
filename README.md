@@ -37,11 +37,11 @@ The app utilizes the CLI terminal for user interaction. There are 3 separate nod
 <br>
 ## Demo
 Click on the link below to view a demonstration of the use of the App <br>
-[!Video link](https://drive.google.com/file/d/1I0BbyozAWvJ5ytq9jsqmCA42HOo-_Iuw/view)
+https://drive.google.com/file/d/1I0BbyozAWvJ5ytq9jsqmCA42HOo-_Iuw/view
 <br>
 
 ## Repository
-[!GitHub]https://github.com/az9000/MySQL-Storefront
+https://github.com/az9000/MySQL-Storefront
 <br>
 
 ## Technologies used
