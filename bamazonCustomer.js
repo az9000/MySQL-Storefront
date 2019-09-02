@@ -43,8 +43,10 @@ function getProducts() {
       type: "input",
       name: "ID",
       message: function() {
-        console.log("Available products for sale:");
+        console.clear();
+        console.log("\nAvailable products for sale:\n");
         console.table(items);
+        console.log("\nEnter product ID:\n");
       },
       validate: function(input) {
         if (!input) {
@@ -70,7 +72,7 @@ function ask(question) {
     if (answers.option) {
       if (answers.option === "Exit") {
         console.log();
-        console.log("Thank You and Good Bye!");
+        console.log("\nThank You and Good Bye!\n");
         console.log();
         process.exit(-1);
       } else {
@@ -154,7 +156,7 @@ function ask(question) {
             results,
             fields
           ) {
-            console.log("Sold!");
+            console.log("\nSold!\n");
             setTimeout(() => {
               ask({
                 type: "list",
