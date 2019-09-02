@@ -41,14 +41,19 @@ connection.connect(function(err){
       departments.push(element.department_name);
     });
 
+    connection.query('select * from products', function(error, results) {
+      products = results;      
+    });
+
   })
 });
 
 function getProducts(askIt) {
   connection.query("select * from products", function(error, results, fields) {
     if (error) throw error;
+    
     products = results;
-
+    
     var items = [];
     products.forEach(element => {
 
@@ -136,7 +141,7 @@ function addToInventory(id, count) {
       console.log("\nInventory added!\n");
       setTimeout(() => {
         getProducts(true);
-      }, 500);
+      }, 1000);
     }
   );
 }
@@ -198,7 +203,7 @@ function ask(question) {
             console.log("\nThere are no low-inventory products!\n");
             setTimeout(() => {
               getProducts(true);
-            }, 500);
+            }, 1000);
           }
           break;
         }
@@ -242,6 +247,11 @@ function ask(question) {
       });
     } else if (answers.item_count) {
       quantityToAdd = parseInt(answers.item_count);
+      products.forEach(element => {        
+        if (element.item_id === productId) {
+          quantityToAdd += parseInt(element.stock_quantity);
+        }
+      });
       // add inventory
       addToInventory(productId, quantityToAdd);
     } else if (answers.product_name) {
